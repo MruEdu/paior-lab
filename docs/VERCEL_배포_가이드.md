@@ -87,13 +87,16 @@ GitHub 저장소에 코드가 **push**될 때마다 Vercel이 자동으로 새�
 ## vercel.json 설정 (이미 적용됨)
 
 프로젝트에 `vercel.json`이 포함되어 있어, SPA 라우팅이 자동으로 동작합니다.
+`better-sqlite3`는 Vercel 빌드 시 제외되며, 랜딩/프론트엔드만 배포됩니다.
 
 ```json
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "installCommand": "npm install --omit=optional",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [...]
 }
 ```
 

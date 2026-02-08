@@ -1,73 +1,17 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import Database from 'better-sqlite3'
 import nodemailer from 'nodemailer'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { dirname, join } from 'path'
 import { appendToSheet, ensureSheetHeaders, updateSatisfactionInSheet } from './googleSheets.js'
+import { db, useMock } from './db.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const dbPath = join(__dirname, 'paoir.db')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
-
-const db = new Database(dbPath)
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS responses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
-    target TEXT NOT NULL,
-    gender TEXT,
-    region TEXT,
-    status TEXT,
-    detail TEXT,
-    concern TEXT,
-    answers TEXT NOT NULL,
-    aoir_a INTEGER,
-    aoir_o INTEGER,
-    aoir_i INTEGER,
-    aoir_r INTEGER,
-    p_struggling INTEGER,
-    p_rebellion INTEGER,
-    p_perfection INTEGER,
-    p_stubborn INTEGER,
-    p_distraction INTEGER,
-    p_satisfaction INTEGER,
-    p_moderate INTEGER,
-    p_dependency INTEGER,
-    p_boredom INTEGER,
-    result_type TEXT,
-    efficiency_index REAL,
-    efficiency_effective_sum INTEGER,
-    report_summary TEXT,
-    report_json TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`)
-
-// 기존 DB 마이그레이션 (새 컬럼 추가)
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN efficiency_index REAL')
-} catch (_) {}
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN efficiency_effective_sum INTEGER')
-} catch (_) {}
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN report_summary TEXT')
-} catch (_) {}
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN report_json TEXT')
-} catch (_) {}
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN detail TEXT')
-} catch (_) {}
-try {
-  db.exec('ALTER TABLE responses ADD COLUMN concern TEXT')
-} catch (_) {}
 
 async function computeScores(answers, target) {
   const enginePath = pathToFileURL(join(__dirname, '..', 'src', 'lib', 'analysisEngine.js')).href
@@ -85,28 +29,29 @@ app.post('/api/submit', async (req, res) => {
     const result = await computeScores(answers, target)
     const { aoir, p, summary, efficiency } = result
 
-    const stmt = db.prepare(`
-      INSERT INTO responses (
-        email, target, gender, region, status, detail, concern, answers,
-        aoir_a, aoir_o, aoir_i, aoir_r,
-        p_struggling, p_rebellion, p_perfection, p_stubborn, p_distraction,
-        p_satisfaction, p_moderate, p_dependency, p_boredom,
-        result_type, efficiency_index, efficiency_effective_sum, report_summary, report_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-
-    stmt.run(
-      email, target || '', gender || '', region || '', status || '', detail || '', concern || '',
-      JSON.stringify(answers),
-      aoir.A, aoir.O, aoir.I, aoir.R,
-      p.고군분투, p.반항, p.완벽, p.외고집, p.잡념,
-      p.만족, p.적당, p.의존, p.싫증,
-      result.type,
-      efficiency?.efficiencyIndex ?? null,
-      efficiency?.effectiveSum ?? null,
-      summary || result.summary || '',
-      JSON.stringify(result)
-    )
+    if (!useMock) {
+      const stmt = db.prepare(`
+        INSERT INTO responses (
+          email, target, gender, region, status, detail, concern, answers,
+          aoir_a, aoir_o, aoir_i, aoir_r,
+          p_struggling, p_rebellion, p_perfection, p_stubborn, p_distraction,
+          p_satisfaction, p_moderate, p_dependency, p_boredom,
+          result_type, efficiency_index, efficiency_effective_sum, report_summary, report_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+      stmt.run(
+        email, target || '', gender || '', region || '', status || '', detail || '', concern || '',
+        JSON.stringify(answers),
+        aoir.A, aoir.O, aoir.I, aoir.R,
+        p.고군분투, p.반항, p.완벽, p.외고집, p.잡념,
+        p.만족, p.적당, p.의존, p.싫증,
+        result.type,
+        efficiency?.efficiencyIndex ?? null,
+        efficiency?.effectiveSum ?? null,
+        summary || result.summary || '',
+        JSON.stringify(result)
+      )
+    }
 
     // Google Sheets 실시간 전송 (닉네임·참여코드 맨 앞 열)
     const sheetResult = await appendToSheet({

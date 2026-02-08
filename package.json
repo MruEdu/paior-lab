@@ -20,9 +20,9 @@
     "sheets:pull-questions": "node server/pullQuestionsFromSheet.js"
   },
   "dependencies": {
-    "better-sqlite3": "^9.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^5.2.1",
     "googleapis": "^128.0.0",
     "html2pdf.js": "^0.14.0",
     "nodemailer": "^8.0.1",

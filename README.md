@@ -30,9 +30,11 @@ npm run dev
 ### 전체 실행 (DB + API 서버)
 
 ```powershell
-npm install                    # better-sqlite3 빌드에 Python 필요
+npm install
 npm run dev:all                # 프론트 + API 동시 실행
 ```
+
+> DB 사용 시: `npm install better-sqlite3` (Python·빌드 도구 필요). 미설치 시 Mock 모드로 동작.
 
 또는 별도 터미널에서:
 - `npm run server`  (포트 3001)
@@ -42,7 +44,7 @@ npm run dev:all                # 프론트 + API 동시 실행
 
 - **프론트엔드**: React, Vite, React Router
 - **백엔드**: Node.js, Express
-- **DB**: SQLite (better-sqlite3)
+- **DB**: SQLite (better-sqlite3) 또는 Mock 모드
 - **Google Sheets**: 실시간 데이터 전송
 
 ## Google Sheets 연동
