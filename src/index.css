@@ -1,0 +1,43 @@
+:root {
+  --paoir-primary: #2563eb;
+  --paoir-primary-dark: #1d4ed8;
+  --paoir-secondary: #0f172a;
+  --paoir-accent: #38bdf8;
+  --paoir-bg: #f8fafc;
+  --paoir-card: #ffffff;
+  --paoir-text: #1e293b;
+  --paoir-text-muted: #64748b;
+  --paoir-border: #e2e8f0;
+  --paoir-success: #10b981;
+  --paoir-warning: #f59e0b;
+  --font-kr: 'Noto Sans KR', -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-kr);
+  background: var(--paoir-bg);
+  color: var(--paoir-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, select {
+  font-family: inherit;
+}

@@ -1,0 +1,38 @@
+{
+  "name": "paoir-diagnostic-platform",
+  "version": "1.0.0",
+  "description": "PAIOR 학습 멘탈 진단 플랫폼",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "start": "node server/index.js",
+    "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
+    "sheets:headers": "node server/setHeaders.js",
+    "sheets:check": "node server/checkSheetsAccess.js",
+    "sheets:question-list": "node server/syncQuestionList.js",
+    "sheets:codebook": "node server/syncCodebook.js",
+    "sheets:seed-dummy": "node server/seedDummyData.js",
+    "sheets:verify-order": "node server/verifyQuestionOrder.js",
+    "sheets:factor-review": "node server/syncFactorReview.js",
+    "sheets:pull-questions": "node server/pullQuestionsFromSheet.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "googleapis": "^128.0.0",
+    "html2pdf.js": "^0.14.0",
+    "nodemailer": "^8.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
+    "vite": "^5.0.0"
+  }
+}
